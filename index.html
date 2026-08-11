@@ -3,209 +3,1298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>下班倒计时 & 实时工资</title>
+<title>Work Timer Pro</title>
 
 <style>
-body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    background:#f5f7fb;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+* {
+    box-sizing: border-box;
 }
 
-.card{
-    width:360px;
-    background:white;
-    border-radius:20px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,.1);
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang SC",
+        "Microsoft YaHei",
+        sans-serif;
+    background: linear-gradient(135deg, #f5f7fb, #e9edf5);
+    color: #202124;
+    display: flex;
+    justify-content: center;
+    padding: 25px 15px;
 }
 
-h1{
-    margin:0;
-    text-align:center;
-    font-size:26px;
+.container {
+    width: 100%;
+    max-width: 560px;
 }
 
-.time{
-    text-align:center;
-    font-size:42px;
-    margin:25px 0;
-    font-weight:bold;
+.header {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.money{
-    text-align:center;
-    font-size:34px;
-    color:#2bb673;
-    font-weight:bold;
+.header h1 {
+    margin: 0;
+    font-size: 28px;
 }
 
-.info{
-    margin-top:25px;
-    line-height:2;
-    color:#666;
+.date {
+    margin-top: 7px;
+    color: #777;
+    font-size: 14px;
 }
 
-.progress{
-    width:100%;
-    height:12px;
-    background:#eee;
-    border-radius:20px;
-    overflow:hidden;
-    margin-top:20px;
+.card {
+    background: rgba(255,255,255,.95);
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
 }
 
-.bar{
-    height:100%;
-    width:0%;
-    background:#4CAF50;
+.label {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 8px;
 }
 
-.footer{
-    margin-top:15px;
-    text-align:center;
-    color:#999;
-    font-size:13px;
+.big-time {
+    font-size: 48px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+    margin: 10px 0;
+}
+
+.money {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    margin: 8px 0;
+}
+
+.normal-money {
+    color: #2878ff;
+}
+
+.overtime-money {
+    color: #ef6c35;
+}
+
+.total-money {
+    color: #16a36a;
+}
+
+.progress {
+    height: 12px;
+    background: #e8e8e8;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 18px 0 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#2878ff,#55a7ff);
+    transition: width .5s;
+}
+
+.progress-text {
+    text-align: center;
+    color: #777;
+    font-size: 13px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.stat {
+    background: #f6f7f9;
+    border-radius: 16px;
+    padding: 15px;
+}
+
+.stat-title {
+    font-size: 13px;
+    color: #777;
+}
+
+.stat-value {
+    margin-top: 5px;
+    font-size: 20px;
+    font-weight: 650;
+}
+
+.overtime-box {
+    border: 2px solid #f1a15b;
+    background: #fff8f1;
+}
+
+.overtime-title {
+    color: #e76d20;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.switch-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    width: 52px;
+    height: 30px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #ccc;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: .3s;
+}
+
+input:checked + .slider {
+    background: #ef6c35;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 11px 16px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.settings-button {
+    width: 100%;
+    background: #f0f1f4;
+    color: #333;
+}
+
+.settings {
+    display: none;
+    margin-top: 15px;
+}
+
+.settings.show {
+    display: block;
+}
+
+.setting-item {
+    margin-bottom: 14px;
+}
+
+.setting-item label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+input[type="time"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    font-size: 15px;
+}
+
+.save-button {
+    width: 100%;
+    background: #2878ff;
+    color: white;
+    margin-top: 5px;
+}
+
+.status {
+    text-align: center;
+    color: #777;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.footer {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+    margin: 20px 0;
+}
+
+@media(max-width:420px) {
+    .big-time {
+        font-size: 40px;
+    }
+
+    .money {
+        font-size: 30px;
+    }
+
+    .card {
+        padding: 19px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="container">
 
-<h1>⏰ 下班倒计时</h1>
+    <div class="header">
+        <h1>💼 Work Timer</h1>
+        <div class="date" id="currentDate"></div>
+    </div>
 
-<div class="time" id="countdown">--:--:--</div>
+    <!-- 正常工作 -->
+    <div class="card">
 
-<div class="money" id="salary">¥0.00</div>
+        <div class="label">⏰ 距离下班</div>
 
-<div class="info">
+        <div class="big-time" id="countdown">
+            --:--:--
+        </div>
 
-<div>🕒 当前时间：<span id="now"></span></div>
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
 
-<div>📈 已工作：<span id="worked"></span></div>
+        <div class="progress-text" id="progressText">
+            工作进度 0%
+        </div>
 
-<div>💵 今日预计：<span id="today"></span></div>
+    </div>
 
-</div>
+    <!-- 今日工资 -->
+    <div class="card">
 
-<div class="progress">
+        <div class="label">💰 今日正常工资</div>
 
-<div class="bar" id="bar"></div>
+        <div class="money normal-money" id="normalSalary">
+            ¥0.00
+        </div>
 
-</div>
+        <div class="grid">
 
-<div class="footer">
+            <div class="stat">
+                <div class="stat-title">今日已赚</div>
+                <div class="stat-value" id="earnedToday">
+                    ¥0.00
+                </div>
+            </div>
 
-实时工资每秒更新
+            <div class="stat">
+                <div class="stat-title">今日预计</div>
+                <div class="stat-value" id="dailySalary">
+                    ¥0.00
+                </div>
+            </div>
 
-</div>
+        </div>
+
+    </div>
+
+    <!-- 加班 -->
+    <div class="card overtime-box">
+
+        <div class="switch-row">
+
+            <div>
+                <div class="overtime-title">
+                    🔥 今天加班
+                </div>
+
+                <div class="label">
+                    开启后进入加班倒计时
+                </div>
+            </div>
+
+            <label class="switch">
+                <input
+                    type="checkbox"
+                    id="overtimeSwitch"
+                    onchange="toggleOvertime()"
+                >
+                <span class="slider"></span>
+            </label>
+
+        </div>
+
+        <div id="overtimePanel" class="hidden">
+
+            <div style="margin-top:20px">
+
+                <div class="label">
+                    🔥 加班倒计时
+                </div>
+
+                <div class="big-time" id="overtimeCountdown">
+                    --:--:--
+                </div>
+
+                <div class="label">
+                    加班工资
+                </div>
+
+                <div class="money overtime-money" id="overtimeSalary">
+                    ¥0.00
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 数据 -->
+    <div class="card">
+
+        <div class="label">📊 本月数据</div>
+
+        <div class="grid">
+
+            <div class="stat">
+                <div class="stat-title">
+                    本月工作日
+                </div>
+
+                <div class="stat-value" id="workDays">
+                    0 天
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">
+                    已工作
+                </div>
+
+                <div class="stat-value" id="workedDays">
+                    0 天
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">
+                    日薪
+                </div>
+
+                <div class="stat-value" id="dailySalary2">
+                    ¥0.00
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">
+                    本月预计
+                </div>
+
+                <div class="stat-value" id="monthlySalary">
+                    ¥0.00
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 设置 -->
+    <div class="card">
+
+        <button
+            class="settings-button"
+            onclick="toggleSettings()"
+        >
+            ⚙️ 设置工作参数
+        </button>
+
+        <div class="settings" id="settings">
+
+            <div class="setting-item">
+                <label>月薪</label>
+                <input
+                    type="number"
+                    id="monthlyPayInput"
+                    placeholder="例如 8000"
+                >
+            </div>
+
+            <div class="setting-item">
+                <label>上班时间</label>
+                <input
+                    type="time"
+                    id="startTimeInput"
+                >
+            </div>
+
+            <div class="setting-item">
+                <label>正常下班时间</label>
+                <input
+                    type="time"
+                    id="endTimeInput"
+                >
+            </div>
+
+            <div class="setting-item">
+                <label>午休开始</label>
+                <input
+                    type="time"
+                    id="lunchStartInput"
+                >
+            </div>
+
+            <div class="setting-item">
+                <label>午休结束</label>
+                <input
+                    type="time"
+                    id="lunchEndInput"
+                >
+            </div>
+
+            <div class="setting-item">
+                <label>工作制度</label>
+
+                <select id="workSystemInput">
+                    <option value="5">双休制（周一至周五）</option>
+                    <option value="6">单休制（周一至周六）</option>
+                </select>
+
+            </div>
+
+            <div class="setting-item">
+                <label>加班结束时间</label>
+                <input
+                    type="time"
+                    id="overtimeEndInput"
+                >
+            </div>
+
+            <div class="setting-item">
+                <label>加班工资倍率</label>
+                <input
+                    type="number"
+                    id="overtimeRateInput"
+                    step="0.1"
+                    min="0"
+                >
+            </div>
+
+            <button
+                class="save-button"
+                onclick="saveSettings()"
+            >
+                保存设置
+            </button>
+
+            <div class="status" id="saveStatus"></div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Work Timer Pro · 实时工资计算
+    </div>
 
 </div>
 
 <script>
 
-// ========= 修改这里 =========
-const hourlyPay = 30;
+/* =========================
+   默认设置
+========================= */
 
-const workStart = "09:00";
+const defaultSettings = {
 
-const lunchStart = "12:00";
+    monthlyPay: 8000,
 
-const lunchEnd = "13:00";
+    startTime: "09:00",
 
-const workEnd = "18:00";
-// ===========================
+    endTime: "18:00",
 
-function parseTime(str){
-    const [h,m]=str.split(":").map(Number);
-    return {h,m};
-}
+    lunchStart: "12:00",
 
-function todayAt(str){
-    const t=parseTime(str);
-    const d=new Date();
-    d.setHours(t.h,t.m,0,0);
+    lunchEnd: "13:00",
+
+    workSystem: 5,
+
+    overtimeEnd: "21:00",
+
+    overtimeRate: 1.5
+};
+
+
+/* =========================
+   读取设置
+========================= */
+
+let settings =
+    JSON.parse(localStorage.getItem("workTimerSettings"))
+    || defaultSettings;
+
+
+/* =========================
+   工具函数
+========================= */
+
+function timeToDate(time) {
+
+    const [hour, minute] =
+        time.split(":").map(Number);
+
+    const d = new Date();
+
+    d.setHours(hour, minute, 0, 0);
+
     return d;
 }
 
-function format(sec){
-    let h=Math.floor(sec/3600);
-    let m=Math.floor((sec%3600)/60);
-    let s=Math.floor(sec%60);
 
-    return String(h).padStart(2,"0")+":"+
-           String(m).padStart(2,"0")+":"+
-           String(s).padStart(2,"0");
+function secondsToTime(seconds) {
+
+    seconds = Math.max(0, Math.floor(seconds));
+
+    const h =
+        Math.floor(seconds / 3600);
+
+    const m =
+        Math.floor((seconds % 3600) / 60);
+
+    const s =
+        seconds % 60;
+
+    return (
+        String(h).padStart(2,"0")
+        + ":"
+        + String(m).padStart(2,"0")
+        + ":"
+        + String(s).padStart(2,"0")
+    );
 }
 
-function update(){
 
-    const now=new Date();
+function formatMoney(number) {
 
-    const start=todayAt(workStart);
+    return "¥" +
+        Number(number).toFixed(2);
+}
 
-    const lunchS=todayAt(lunchStart);
 
-    const lunchE=todayAt(lunchEnd);
+/* =========================
+   当前月份工作日
+========================= */
 
-    const end=todayAt(workEnd);
+function getWorkDays(year, month) {
 
-    document.getElementById("now").innerHTML=now.toLocaleTimeString();
+    let count = 0;
 
-    let worked=0;
+    const days =
+        new Date(year, month + 1, 0).getDate();
 
-    if(now>start){
+    for(let day = 1; day <= days; day++) {
 
-        worked=(Math.min(now,end)-start)/1000;
+        const date =
+            new Date(year, month, day);
 
-        if(now>lunchS){
+        const week =
+            date.getDay();
 
-            let lunch=(Math.min(now,lunchE)-lunchS)/1000;
+        /*
+            双休：周一~周五
+            单休：周一~周六
+        */
 
-            if(lunch>0) worked-=lunch;
+        if(settings.workSystem == 5) {
 
+            if(week >= 1 && week <= 5) {
+                count++;
+            }
+
+        } else {
+
+            if(week >= 1 && week <= 6) {
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+
+/* =========================
+   获取本月工作日列表
+========================= */
+
+function getWorkDayList(year, month) {
+
+    const list = [];
+
+    const days =
+        new Date(year, month + 1, 0).getDate();
+
+    for(let day = 1; day <= days; day++) {
+
+        const date =
+            new Date(year, month, day);
+
+        const week =
+            date.getDay();
+
+        let isWorkDay = false;
+
+        if(settings.workSystem == 5) {
+
+            isWorkDay =
+                week >= 1 && week <= 5;
+
+        } else {
+
+            isWorkDay =
+                week >= 1 && week <= 6;
+        }
+
+        if(isWorkDay) {
+            list.push(day);
+        }
+    }
+
+    return list;
+}
+
+
+/* =========================
+   是否工作日
+========================= */
+
+function isTodayWorkDay() {
+
+    const now = new Date();
+
+    const week =
+        now.getDay();
+
+    if(settings.workSystem == 5) {
+
+        return week >= 1 && week <= 5;
+
+    } else {
+
+        return week >= 1 && week <= 6;
+    }
+}
+
+
+/* =========================
+   计算已经工作的天数
+========================= */
+
+function getWorkedDays() {
+
+    const now = new Date();
+
+    const year =
+        now.getFullYear();
+
+    const month =
+        now.getMonth();
+
+    const today =
+        now.getDate();
+
+    const workDays =
+        getWorkDayList(year, month);
+
+    return workDays.filter(day => day <= today).length;
+}
+
+
+/* =========================
+   设置页面
+========================= */
+
+function loadSettingsToUI() {
+
+    document.getElementById("monthlyPayInput").value =
+        settings.monthlyPay;
+
+    document.getElementById("startTimeInput").value =
+        settings.startTime;
+
+    document.getElementById("endTimeInput").value =
+        settings.endTime;
+
+    document.getElementById("lunchStartInput").value =
+        settings.lunchStart;
+
+    document.getElementById("lunchEndInput").value =
+        settings.lunchEnd;
+
+    document.getElementById("workSystemInput").value =
+        settings.workSystem;
+
+    document.getElementById("overtimeEndInput").value =
+        settings.overtimeEnd;
+
+    document.getElementById("overtimeRateInput").value =
+        settings.overtimeRate;
+}
+
+
+function saveSettings() {
+
+    settings = {
+
+        monthlyPay:
+            Number(
+                document.getElementById(
+                    "monthlyPayInput"
+                ).value
+            ),
+
+        startTime:
+            document.getElementById(
+                "startTimeInput"
+            ).value,
+
+        endTime:
+            document.getElementById(
+                "endTimeInput"
+            ).value,
+
+        lunchStart:
+            document.getElementById(
+                "lunchStartInput"
+            ).value,
+
+        lunchEnd:
+            document.getElementById(
+                "lunchEndInput"
+            ).value,
+
+        workSystem:
+            Number(
+                document.getElementById(
+                    "workSystemInput"
+                ).value
+            ),
+
+        overtimeEnd:
+            document.getElementById(
+                "overtimeEndInput"
+            ).value,
+
+        overtimeRate:
+            Number(
+                document.getElementById(
+                    "overtimeRateInput"
+                ).value
+            )
+    };
+
+    localStorage.setItem(
+        "workTimerSettings",
+        JSON.stringify(settings)
+    );
+
+    document.getElementById(
+        "saveStatus"
+    ).innerText =
+        "✓ 设置已保存";
+
+    update();
+
+    setTimeout(() => {
+
+        document.getElementById(
+            "saveStatus"
+        ).innerText = "";
+
+    }, 2000);
+}
+
+
+function toggleSettings() {
+
+    document
+        .getElementById("settings")
+        .classList.toggle("show");
+
+}
+
+
+/* =========================
+   加班开关
+========================= */
+
+function toggleOvertime() {
+
+    const checked =
+        document.getElementById(
+            "overtimeSwitch"
+        ).checked;
+
+    const panel =
+        document.getElementById(
+            "overtimePanel"
+        );
+
+    if(checked) {
+
+        panel.classList.remove("hidden");
+
+    } else {
+
+        panel.classList.add("hidden");
+    }
+
+    update();
+}
+
+
+/* =========================
+   工资计算
+========================= */
+
+function calculateSalary() {
+
+    const now =
+        new Date();
+
+    const year =
+        now.getFullYear();
+
+    const month =
+        now.getMonth();
+
+    const workDays =
+        getWorkDays(year, month);
+
+    /*
+        日薪 = 月薪 ÷ 当月工作日
+    */
+
+    const dailySalary =
+        settings.monthlyPay / workDays;
+
+    /*
+        正常工作小时数
+    */
+
+    const start =
+        timeToDate(settings.startTime);
+
+    const end =
+        timeToDate(settings.endTime);
+
+    const lunchStart =
+        timeToDate(settings.lunchStart);
+
+    const lunchEnd =
+        timeToDate(settings.lunchEnd);
+
+    let workSeconds =
+        (end - start) / 1000;
+
+    workSeconds -=
+        (lunchEnd - lunchStart) / 1000;
+
+    const hourlySalary =
+        dailySalary /
+        (workSeconds / 3600);
+
+    return {
+        workDays,
+        dailySalary,
+        hourlySalary
+    };
+}
+
+
+/* =========================
+   主更新函数
+========================= */
+
+function update() {
+
+    const now =
+        new Date();
+
+    document.getElementById(
+        "currentDate"
+    ).innerText =
+        now.toLocaleDateString(
+            "zh-CN",
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                weekday: "long"
+            }
+        );
+
+
+    const salary =
+        calculateSalary();
+
+
+    /*
+        更新本月数据
+    */
+
+    document.getElementById(
+        "workDays"
+    ).innerText =
+        salary.workDays + " 天";
+
+
+    document.getElementById(
+        "workedDays"
+    ).innerText =
+        getWorkedDays() + " 天";
+
+
+    document.getElementById(
+        "dailySalary"
+    ).innerText =
+        formatMoney(
+            salary.dailySalary
+        );
+
+
+    document.getElementById(
+        "dailySalary2"
+    ).innerText =
+        formatMoney(
+            salary.dailySalary
+        );
+
+
+    document.getElementById(
+        "monthlySalary"
+    ).innerText =
+        formatMoney(
+            settings.monthlyPay
+        );
+
+
+    /*
+        判断今天是否工作日
+    */
+
+    if(!isTodayWorkDay()) {
+
+        document.getElementById(
+            "countdown"
+        ).innerText =
+            "今天休息 🎉";
+
+        document.getElementById(
+            "progressBar"
+        ).style.width = "0%";
+
+        document.getElementById(
+            "progressText"
+        ).innerText =
+            "今天不是工作日";
+
+        return;
+    }
+
+
+    /*
+        正常工作时间
+    */
+
+    const start =
+        timeToDate(settings.startTime);
+
+    const end =
+        timeToDate(settings.endTime);
+
+    const lunchStart =
+        timeToDate(settings.lunchStart);
+
+    const lunchEnd =
+        timeToDate(settings.lunchEnd);
+
+
+    /*
+        下班倒计时
+    */
+
+    let remaining =
+        (end - now) / 1000;
+
+
+    if(remaining > 0) {
+
+        document.getElementById(
+            "countdown"
+        ).innerText =
+            secondsToTime(remaining);
+
+    } else {
+
+        document.getElementById(
+            "countdown"
+        ).innerText =
+            "下班啦 🎉";
+    }
+
+
+    /*
+        今日正常工作时间
+    */
+
+    const totalWorkSeconds =
+        (end - start) / 1000
+        -
+        (lunchEnd - lunchStart) / 1000;
+
+
+    let workedSeconds = 0;
+
+
+    if(now > start) {
+
+        workedSeconds =
+            Math.min(
+                now,
+                end
+            ) - start;
+
+        workedSeconds =
+            workedSeconds / 1000;
+
+
+        /*
+            扣除午休
+        */
+
+        if(now > lunchStart) {
+
+            const lunch =
+                Math.min(
+                    now,
+                    lunchEnd
+                ) - lunchStart;
+
+            if(lunch > 0) {
+
+                workedSeconds -=
+                    lunch / 1000;
+            }
         }
 
     }
 
-    if(worked<0) worked=0;
 
-    let total=(end-start)/1000-(lunchE-lunchS)/1000;
+    workedSeconds =
+        Math.max(
+            0,
+            Math.min(
+                workedSeconds,
+                totalWorkSeconds
+            )
+        );
 
-    let salary=worked/3600*hourlyPay;
 
-    document.getElementById("salary").innerHTML=
-        "¥"+salary.toFixed(2);
+    /*
+        工作进度
+    */
 
-    document.getElementById("worked").innerHTML=
-        format(worked);
+    const progress =
+        Math.min(
+            100,
+            workedSeconds /
+            totalWorkSeconds *
+            100
+        );
 
-    document.getElementById("today").innerHTML=
-        "¥"+(hourlyPay*total/3600).toFixed(2);
 
-    let remain=(end-now)/1000;
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        progress + "%";
 
-    if(remain<0) remain=0;
 
-    document.getElementById("countdown").innerHTML=
-        format(remain);
+    document.getElementById(
+        "progressText"
+    ).innerText =
+        "工作进度 " +
+        progress.toFixed(1) +
+        "%";
 
-    let percent=Math.min(worked/total*100,100);
 
-    document.getElementById("bar").style.width=
-        percent+"%";
+    /*
+        今日正常工资
+    */
+
+    const normalEarned =
+        salary.hourlySalary *
+        workedSeconds /
+        3600;
+
+
+    document.getElementById(
+        "normalSalary"
+    ).innerText =
+        formatMoney(
+            normalEarned
+        );
+
+
+    document.getElementById(
+        "earnedToday"
+    ).innerText =
+        formatMoney(
+            normalEarned
+        );
+
+
+    /*
+        加班
+    */
+
+    const overtimeEnabled =
+        document.getElementById(
+            "overtimeSwitch"
+        ).checked;
+
+
+    if(overtimeEnabled) {
+
+        const overtimeEnd =
+            timeToDate(
+                settings.overtimeEnd
+            );
+
+
+        /*
+            加班开始 = 正常下班时间
+        */
+
+        let overtimeSeconds =
+            0;
+
+        if(now > end) {
+
+            overtimeSeconds =
+                Math.min(
+                    now,
+                    overtimeEnd
+                ) - end;
+
+            overtimeSeconds =
+                Math.max(
+                    0,
+                    overtimeSeconds / 1000
+                );
+        }
+
+
+        /*
+            加班倒计时
+        */
+
+        let overtimeRemaining =
+            (overtimeEnd - now) / 1000;
+
+
+        document.getElementById(
+            "overtimeCountdown"
+        ).innerText =
+            overtimeRemaining > 0
+            ? secondsToTime(
+                overtimeRemaining
+            )
+            : "加班结束 🎉";
+
+
+        /*
+            加班工资
+        */
+
+        const overtimeHourly =
+            salary.hourlySalary *
+            settings.overtimeRate;
+
+
+        const overtimeEarned =
+            overtimeHourly *
+            overtimeSeconds /
+            3600;
+
+
+        document.getElementById(
+            "overtimeSalary"
+        ).innerText =
+            formatMoney(
+                overtimeEarned
+            );
+
+    } else {
+
+        document.getElementById(
+            "overtimeSalary"
+        ).innerText =
+            "¥0.00";
+
+    }
 
 }
 
+
+/* =========================
+   初始化
+========================= */
+
+loadSettingsToUI();
+
 update();
 
-setInterval(update,1000);
+setInterval(
+    update,
+    1000
+);
 
 </script>
 
