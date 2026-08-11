@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>下班倒计时 & 实时工资</title>
+
+<style>
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#f5f7fb;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.card{
+    width:360px;
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+h1{
+    margin:0;
+    text-align:center;
+    font-size:26px;
+}
+
+.time{
+    text-align:center;
+    font-size:42px;
+    margin:25px 0;
+    font-weight:bold;
+}
+
+.money{
+    text-align:center;
+    font-size:34px;
+    color:#2bb673;
+    font-weight:bold;
+}
+
+.info{
+    margin-top:25px;
+    line-height:2;
+    color:#666;
+}
+
+.progress{
+    width:100%;
+    height:12px;
+    background:#eee;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:20px;
+}
+
+.bar{
+    height:100%;
+    width:0%;
+    background:#4CAF50;
+}
+
+.footer{
+    margin-top:15px;
+    text-align:center;
+    color:#999;
+    font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>⏰ 下班倒计时</h1>
+
+<div class="time" id="countdown">--:--:--</div>
+
+<div class="money" id="salary">¥0.00</div>
+
+<div class="info">
+
+<div>🕒 当前时间：<span id="now"></span></div>
+
+<div>📈 已工作：<span id="worked"></span></div>
+
+<div>💵 今日预计：<span id="today"></span></div>
+
+</div>
+
+<div class="progress">
+
+<div class="bar" id="bar"></div>
+
+</div>
+
+<div class="footer">
+
+实时工资每秒更新
+
+</div>
+
+</div>
+
+<script>
+
+// ========= 修改这里 =========
+const hourlyPay = 30;
+
+const workStart = "09:00";
+
+const lunchStart = "12:00";
+
+const lunchEnd = "13:00";
+
+const workEnd = "18:00";
+// ===========================
+
+function parseTime(str){
+    const [h,m]=str.split(":").map(Number);
+    return {h,m};
+}
+
+function todayAt(str){
+    const t=parseTime(str);
+    const d=new Date();
+    d.setHours(t.h,t.m,0,0);
+    return d;
+}
+
+function format(sec){
+    let h=Math.floor(sec/3600);
+    let m=Math.floor((sec%3600)/60);
+    let s=Math.floor(sec%60);
+
+    return String(h).padStart(2,"0")+":"+
+           String(m).padStart(2,"0")+":"+
+           String(s).padStart(2,"0");
+}
+
+function update(){
+
+    const now=new Date();
+
+    const start=todayAt(workStart);
+
+    const lunchS=todayAt(lunchStart);
+
+    const lunchE=todayAt(lunchEnd);
+
+    const end=todayAt(workEnd);
+
+    document.getElementById("now").innerHTML=now.toLocaleTimeString();
+
+    let worked=0;
+
+    if(now>start){
+
+        worked=(Math.min(now,end)-start)/1000;
+
+        if(now>lunchS){
+
+            let lunch=(Math.min(now,lunchE)-lunchS)/1000;
+
+            if(lunch>0) worked-=lunch;
+
+        }
+
+    }
+
+    if(worked<0) worked=0;
+
+    let total=(end-start)/1000-(lunchE-lunchS)/1000;
+
+    let salary=worked/3600*hourlyPay;
+
+    document.getElementById("salary").innerHTML=
+        "¥"+salary.toFixed(2);
+
+    document.getElementById("worked").innerHTML=
+        format(worked);
+
+    document.getElementById("today").innerHTML=
+        "¥"+(hourlyPay*total/3600).toFixed(2);
+
+    let remain=(end-now)/1000;
+
+    if(remain<0) remain=0;
+
+    document.getElementById("countdown").innerHTML=
+        format(remain);
+
+    let percent=Math.min(worked/total*100,100);
+
+    document.getElementById("bar").style.width=
+        percent+"%";
+
+}
+
+update();
+
+setInterval(update,1000);
+
+</script>
+
+</body>
+</html>
