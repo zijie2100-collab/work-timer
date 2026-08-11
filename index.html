@@ -43,6 +43,7 @@
 body {
     margin: 0;
     min-height: 100vh;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -59,6 +60,7 @@ body {
         );
 
     color: #202124;
+
     padding: 24px 14px;
 }
 
@@ -217,13 +219,19 @@ body {
 
 .slider:before {
     content: "";
+
     position: absolute;
+
     width: 24px;
     height: 24px;
+
     left: 3px;
     top: 3px;
+
     background: white;
+
     border-radius: 50%;
+
     transition: .25s;
 }
 
@@ -275,6 +283,7 @@ button {
 .setting input,
 .setting select {
     width: 100%;
+
     padding: 11px;
 
     border:
@@ -283,6 +292,7 @@ button {
     border-radius: 10px;
 
     font-size: 15px;
+
     background: white;
 }
 
@@ -334,6 +344,7 @@ button {
     .card {
         padding: 19px;
     }
+
 }
 
 </style>
@@ -344,6 +355,7 @@ button {
 <body>
 
 <div class="container">
+
 
     <!-- ===============================
          标题
@@ -693,6 +705,8 @@ button {
             id="settings">
 
 
+            <!-- 月薪 -->
+
             <div class="setting">
 
                 <label>
@@ -707,6 +721,8 @@ button {
             </div>
 
 
+            <!-- 上班时间 -->
+
             <div class="setting">
 
                 <label>
@@ -720,6 +736,8 @@ button {
             </div>
 
 
+            <!-- 下班时间 -->
+
             <div class="setting">
 
                 <label>
@@ -732,6 +750,8 @@ button {
 
             </div>
 
+
+            <!-- 午休 -->
 
             <div class="setting">
 
@@ -759,6 +779,8 @@ button {
             </div>
 
 
+            <!-- 工作制度 -->
+
             <div class="setting">
 
                 <label>
@@ -781,6 +803,8 @@ button {
             </div>
 
 
+            <!-- 加班结束 -->
+
             <div class="setting">
 
                 <label>
@@ -794,6 +818,32 @@ button {
             </div>
 
 
+            <!-- 加班计算方式 -->
+
+            <div class="setting">
+
+                <label>
+                    加班工资计算方式
+                </label>
+
+                <select
+                    id="overtimePayTypeInput">
+
+                    <option value="rate">
+                        按正常时薪 × 倍率
+                    </option>
+
+                    <option value="fixed">
+                        固定每小时工资
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- 加班倍率 -->
+
             <div class="setting">
 
                 <label>
@@ -804,7 +854,26 @@ button {
                     type="number"
                     id="overtimeRateInput"
                     step="0.1"
-                    min="0">
+                    min="0"
+                    placeholder="例如 1.5">
+
+            </div>
+
+
+            <!-- 固定加班工资 -->
+
+            <div class="setting">
+
+                <label>
+                    固定加班每小时工资
+                </label>
+
+                <input
+                    type="number"
+                    id="overtimeFixedPayInput"
+                    step="0.01"
+                    min="0"
+                    placeholder="例如 50">
 
             </div>
 
@@ -860,7 +929,11 @@ const defaultSettings = {
 
     overtimeEnd: "21:00",
 
-    overtimeRate: 1.5
+    overtimeRate: 1.5,
+
+    overtimePayType: "rate",
+
+    overtimeFixedPay: 50
 
 };
 
@@ -869,12 +942,21 @@ const defaultSettings = {
    读取本地设置
 ===================================================== */
 
+let savedSettings =
+    localStorage.getItem(
+        "workTimerSettings"
+    );
+
+
 let settings =
-    JSON.parse(
-        localStorage.getItem(
-            "workTimerSettings"
-        )
-    ) || defaultSettings;
+    savedSettings
+    ? {
+        ...defaultSettings,
+        ...JSON.parse(savedSettings)
+      }
+    : {
+        ...defaultSettings
+      };
 
 
 /* =====================================================
@@ -968,6 +1050,7 @@ function dateKey(date) {
         ).padStart(2, "0");
 
     return `${y}-${m}-${d}`;
+
 }
 
 
@@ -987,6 +1070,7 @@ function timeToDate(time) {
     );
 
     return d;
+
 }
 
 
@@ -1018,6 +1102,7 @@ function secondsToTime(seconds) {
         + ":"
         + String(s).padStart(2, "0")
     );
+
 }
 
 
@@ -1218,8 +1303,11 @@ function calculateSalary() {
         );
 
     const dailySalary =
-        settings.monthlyPay /
-        workDays;
+        workDays > 0
+        ? settings.monthlyPay /
+          workDays
+        : 0;
+
 
     const start =
         timeToDate(
@@ -1241,8 +1329,10 @@ function calculateSalary() {
             settings.lunchEnd
         );
 
+
     let normalSeconds =
         (end - start) / 1000;
+
 
     normalSeconds -=
         (
@@ -1250,9 +1340,13 @@ function calculateSalary() {
             lunchStart
         ) / 1000;
 
+
     const hourlySalary =
-        dailySalary /
-        (normalSeconds / 3600);
+        normalSeconds > 0
+        ? dailySalary /
+          (normalSeconds / 3600)
+        : 0;
+
 
     return {
 
@@ -1287,6 +1381,7 @@ function updateTodayStatus() {
     const work =
         isWorkday(now);
 
+
     const title =
         document.getElementById(
             "todayStatus"
@@ -1296,6 +1391,7 @@ function updateTodayStatus() {
         document.getElementById(
             "todayStatusInfo"
         );
+
 
     if (makeup) {
 
@@ -1308,6 +1404,7 @@ function updateTodayStatus() {
         return;
 
     }
+
 
     if (holiday) {
 
@@ -1325,6 +1422,7 @@ function updateTodayStatus() {
 
     }
 
+
     if (work) {
 
         title.innerText =
@@ -1338,6 +1436,7 @@ function updateTodayStatus() {
         return;
 
     }
+
 
     title.innerText =
         "😌 今天休息";
@@ -1366,6 +1465,7 @@ function updateNextHoliday() {
                 holiday.end >= currentKey
         );
 
+
     if (!next) {
 
         document.getElementById(
@@ -1382,10 +1482,12 @@ function updateNextHoliday() {
 
     }
 
+
     document.getElementById(
         "nextHoliday"
     ).innerText =
         "🎉 " + next.name;
+
 
     document.getElementById(
         "nextHolidayInfo"
@@ -1408,40 +1510,59 @@ function loadSettings() {
     ).value =
         settings.monthlyPay;
 
+
     document.getElementById(
         "startTimeInput"
     ).value =
         settings.startTime;
+
 
     document.getElementById(
         "endTimeInput"
     ).value =
         settings.endTime;
 
+
     document.getElementById(
         "lunchStartInput"
     ).value =
         settings.lunchStart;
+
 
     document.getElementById(
         "lunchEndInput"
     ).value =
         settings.lunchEnd;
 
+
     document.getElementById(
         "workSystemInput"
     ).value =
         settings.workSystem;
+
 
     document.getElementById(
         "overtimeEndInput"
     ).value =
         settings.overtimeEnd;
 
+
     document.getElementById(
         "overtimeRateInput"
     ).value =
         settings.overtimeRate;
+
+
+    document.getElementById(
+        "overtimePayTypeInput"
+    ).value =
+        settings.overtimePayType;
+
+
+    document.getElementById(
+        "overtimeFixedPayInput"
+    ).value =
+        settings.overtimeFixedPay;
 
 }
 
@@ -1450,32 +1571,40 @@ function saveSettings() {
 
     settings = {
 
+        ...settings,
+
+
         monthlyPay:
             Number(
                 document.getElementById(
                     "monthlyPayInput"
                 ).value
-            ),
+            ) || 0,
+
 
         startTime:
             document.getElementById(
                 "startTimeInput"
             ).value,
 
+
         endTime:
             document.getElementById(
                 "endTimeInput"
             ).value,
+
 
         lunchStart:
             document.getElementById(
                 "lunchStartInput"
             ).value,
 
+
         lunchEnd:
             document.getElementById(
                 "lunchEndInput"
             ).value,
+
 
         workSystem:
             Number(
@@ -1484,31 +1613,51 @@ function saveSettings() {
                 ).value
             ),
 
+
         overtimeEnd:
             document.getElementById(
                 "overtimeEndInput"
             ).value,
+
 
         overtimeRate:
             Number(
                 document.getElementById(
                     "overtimeRateInput"
                 ).value
-            )
+            ) || 0,
+
+
+        overtimePayType:
+            document.getElementById(
+                "overtimePayTypeInput"
+            ).value,
+
+
+        overtimeFixedPay:
+            Number(
+                document.getElementById(
+                    "overtimeFixedPayInput"
+                ).value
+            ) || 0
 
     };
+
 
     localStorage.setItem(
         "workTimerSettings",
         JSON.stringify(settings)
     );
 
+
     document.getElementById(
         "saveStatus"
     ).innerText =
         "✓ 设置已保存";
 
+
     update();
+
 
     setTimeout(
         () => {
@@ -1546,10 +1695,12 @@ function toggleOvertime() {
             "overtimeSwitch"
         ).checked;
 
+
     const panel =
         document.getElementById(
             "overtimePanel"
         );
+
 
     if (checked) {
 
@@ -1565,7 +1716,40 @@ function toggleOvertime() {
 
     }
 
+
     update();
+
+}
+
+
+/* =====================================================
+   计算加班时薪
+===================================================== */
+
+function getOvertimeHourlySalary(
+    normalHourlySalary
+) {
+
+    if (
+        settings.overtimePayType ===
+        "fixed"
+    ) {
+
+        return Number(
+            settings.overtimeFixedPay
+        ) || 0;
+
+    }
+
+
+    return (
+        normalHourlySalary *
+        (
+            Number(
+                settings.overtimeRate
+            ) || 0
+        )
+    );
 
 }
 
@@ -1578,6 +1762,7 @@ function update() {
 
     const now =
         new Date();
+
 
     document.getElementById(
         "currentDate"
@@ -1592,12 +1777,15 @@ function update() {
             }
         );
 
+
     updateTodayStatus();
 
     updateNextHoliday();
 
+
     const salary =
         calculateSalary();
+
 
     document.getElementById(
         "workDays"
@@ -1605,11 +1793,13 @@ function update() {
         salary.workDays +
         " 天";
 
+
     document.getElementById(
         "workedDays"
     ).innerText =
         getWorkedDays() +
         " 天";
+
 
     document.getElementById(
         "dailySalary"
@@ -1618,12 +1808,14 @@ function update() {
             salary.dailySalary
         );
 
+
     document.getElementById(
         "dailySalary2"
     ).innerText =
         money(
             salary.dailySalary
         );
+
 
     document.getElementById(
         "monthlySalary"
@@ -1646,25 +1838,41 @@ function update() {
         ).innerText =
             "今天休息 🎉";
 
+
         document.getElementById(
             "progressBar"
         ).style.width =
             "0%";
+
 
         document.getElementById(
             "progressText"
         ).innerText =
             "今天不是工作日";
 
+
         document.getElementById(
             "normalSalary"
         ).innerText =
             "¥0.00";
 
+
         document.getElementById(
             "earnedToday"
         ).innerText =
             "¥0.00";
+
+
+        /*
+           即使休息日开启加班，
+           也不进行普通工资计算。
+        */
+
+        document.getElementById(
+            "overtimeSalary"
+        ).innerText =
+            "¥0.00";
+
 
         return;
 
@@ -1680,15 +1888,18 @@ function update() {
             settings.startTime
         );
 
+
     const end =
         timeToDate(
             settings.endTime
         );
 
+
     const lunchStart =
         timeToDate(
             settings.lunchStart
         );
+
 
     const lunchEnd =
         timeToDate(
@@ -1701,7 +1912,11 @@ function update() {
     */
 
     const remaining =
-        (end - now) / 1000;
+        (
+            end -
+            now
+        ) / 1000;
+
 
     if (
         remaining > 0
@@ -1729,7 +1944,10 @@ function update() {
     */
 
     const totalWorkSeconds =
-        (end - start) / 1000
+        (
+            end -
+            start
+        ) / 1000
         -
         (
             lunchEnd -
@@ -1738,6 +1956,7 @@ function update() {
 
 
     let workedSeconds = 0;
+
 
     if (
         now > start
@@ -1748,12 +1967,13 @@ function update() {
                 Math.min(
                     now,
                     end
-                ) - start
+                ) -
+                start
             ) / 1000;
 
 
         /*
-           扣午休
+           扣除午休
         */
 
         if (
@@ -1764,7 +1984,9 @@ function update() {
                 Math.min(
                     now,
                     lunchEnd
-                ) - lunchStart;
+                ) -
+                lunchStart;
+
 
             if (
                 lunch > 0
@@ -1795,17 +2017,21 @@ function update() {
     */
 
     const progress =
-        Math.min(
+        totalWorkSeconds > 0
+        ? Math.min(
             100,
             workedSeconds /
             totalWorkSeconds *
             100
-        );
+        )
+        : 0;
+
 
     document.getElementById(
         "progressBar"
     ).style.width =
         progress + "%";
+
 
     document.getElementById(
         "progressText"
@@ -1824,12 +2050,14 @@ function update() {
         workedSeconds /
         3600;
 
+
     document.getElementById(
         "normalSalary"
     ).innerText =
         money(
             normalEarned
         );
+
 
     document.getElementById(
         "earnedToday"
@@ -1848,6 +2076,7 @@ function update() {
             "overtimeSwitch"
         ).checked;
 
+
     if (
         !overtimeEnabled
     ) {
@@ -1856,6 +2085,13 @@ function update() {
             "overtimeSalary"
         ).innerText =
             "¥0.00";
+
+
+        document.getElementById(
+            "overtimeCountdown"
+        ).innerText =
+            "--:--:--";
+
 
         return;
 
@@ -1870,6 +2106,11 @@ function update() {
 
     let overtimeSeconds = 0;
 
+
+    /*
+       加班已经赚了多少秒
+    */
+
     if (
         now > end
     ) {
@@ -1879,8 +2120,10 @@ function update() {
                 Math.min(
                     now,
                     overtimeEnd
-                ) - end
+                ) -
+                end
             ) / 1000;
+
 
         overtimeSeconds =
             Math.max(
@@ -1890,6 +2133,10 @@ function update() {
 
     }
 
+
+    /*
+       加班剩余时间
+    */
 
     const overtimeRemaining =
         (
@@ -1901,6 +2148,7 @@ function update() {
     document.getElementById(
         "overtimeCountdown"
     ).innerText =
+
         overtimeRemaining > 0
         ? secondsToTime(
             overtimeRemaining
@@ -1908,10 +2156,19 @@ function update() {
         : "加班结束 🎉";
 
 
-    const overtimeHourly =
-        salary.hourlySalary *
-        settings.overtimeRate;
+    /*
+       根据选择计算加班时薪
+    */
 
+    const overtimeHourly =
+        getOvertimeHourlySalary(
+            salary.hourlySalary
+        );
+
+
+    /*
+       加班工资
+    */
 
     const overtimeEarned =
         overtimeHourly *
@@ -1937,6 +2194,11 @@ loadSettings();
 
 update();
 
+
+/*
+   每秒更新
+*/
+
 setInterval(
     update,
     1000
@@ -1945,7 +2207,6 @@ setInterval(
 
 /* =====================================================
    注册 Service Worker
-   用于离线运行
 ===================================================== */
 
 if (
