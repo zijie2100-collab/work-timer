@@ -1,0 +1,11 @@
+{
+  "name": "Work Timer Pro",
+  "short_name": "Work Timer",
+  "description": "个人工作时间与工资计算器",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f6fa",
+  "theme_color": "#2878ff",
+  "orientation": "portrait",
+  "icons": []
+}
